@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  pulse:
+    build: .
+    ports:
+      - "3001:3001"
+    volumes:
+      - pulse_data:/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATA_DIR=/data
+    restart: unless-stopped
+
+volumes:
+  pulse_data:

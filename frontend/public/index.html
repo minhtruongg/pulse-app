@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pulse — Know what users actually do</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/landing.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+  <div class="grid-bg"></div>
+  <div class="glow-orb"></div>
+
+  <!-- ── LANDING ── -->
+  <div class="page active" id="landing">
+    <div class="landing-inner">
+      <div class="badge">● Now in open beta</div>
+      <h1>Know what users<br><span>actually do.</span></h1>
+      <p class="sub">One script tag. Real-time event tracking. No config, no noise. Just the truth about your users.</p>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button class="btn-primary" style="width:auto;padding:16px 40px;" onclick="UI.showPage('signup')">Get started free →</button>
+        <button class="btn-outline" onclick="UI.showPage('login')">Sign in</button>
+      </div>
+      <div class="features">
+        <div class="feature"><div class="feature-num">01</div><div class="feature-title">One script tag</div><div class="feature-desc">Paste it once. Tracks page views, clicks, and inputs automatically.</div></div>
+        <div class="feature"><div class="feature-num">02</div><div class="feature-title">Real-time feed</div><div class="feature-desc">Watch events appear as they happen. No refresh needed.</div></div>
+        <div class="feature"><div class="feature-num">03</div><div class="feature-title">Free forever</div><div class="feature-desc">No credit card. No limits. Just sign up and go.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SIGNUP ── -->
+  <div class="page" id="signup">
+    <div class="auth-inner">
+      <div class="auth-logo" onclick="UI.showPage('landing')">pulse<span>.</span></div>
+      <div class="auth-box">
+        <h2 class="auth-title">Create your account</h2>
+        <p class="auth-sub">Free forever. No credit card.</p>
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="signupEmail" placeholder="you@example.com">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="signupPassword" placeholder="min 6 characters">
+        <form onsubmit="return false">
+        <button class="btn-primary" id="signupBtn">Create account →</button>
+        </form>
+        <p class="auth-msg" id="signupMsg"></p>
+        <p class="auth-switch">Already have an account? <a onclick="UI.showPage('login')">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LOGIN ── -->
+  <div class="page" id="login">
+    <div class="auth-inner">
+      <div class="auth-logo" onclick="UI.showPage('landing')">pulse<span>.</span></div>
+      <div class="auth-box">
+        <h2 class="auth-title">Welcome back</h2>
+        <p class="auth-sub">Sign in to your dashboard</p>
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="loginEmail" placeholder="you@example.com">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="loginPassword" placeholder="••••••••">
+        <form onsubmit="return false">
+        <button class="btn-primary" id="loginBtn">Sign in →</button>
+        </form>
+        <p class="auth-msg" id="loginMsg"></p>
+        <p class="auth-switch">Don't have an account? <a onclick="UI.showPage('signup')">Sign up free</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ONBOARDING (new project) ── -->
+  <div class="page" id="onboarding">
+    <div class="onboard-inner">
+      <div class="step-header">
+        <div class="step-tag">New project</div>
+        <div class="step-title">Add your website</div>
+        <div class="step-sub">We'll generate a tracking script you can paste into your site.</div>
+      </div>
+      <div class="card">
+        <label class="form-label">Project name</label>
+        <input class="form-input" type="text" id="projectName" placeholder="e.g. My Portfolio">
+        <label class="form-label">Website URL</label>
+        <input class="form-input" type="text" id="projectSite" placeholder="e.g. mysite.com">
+        <button class="btn-primary" id="createProjectBtn">Create project →</button>
+        <button class="btn-cancel" id="cancelProjectBtn">Cancel</button>
+        <p class="auth-msg" id="projectMsg"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCRIPT PAGE ── -->
+  <div class="page" id="scriptPage">
+    <div class="onboard-inner">
+      <div class="step-header">
+        <div class="step-tag">You're in ✓</div>
+        <div class="step-title">Paste this into your site</div>
+        <div class="step-sub">Add this before <code>&lt;/body&gt;</code> on every page you want to track.</div>
+      </div>
+      <div class="card">
+        <div class="form-label">Your Project ID</div>
+        <div class="project-id-display">
+          <span id="displayProjectId">–</span>
+          <button class="copy-btn" id="copyIdBtn">Copy</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="form-label">Tracking script</div>
+        <div class="code-block" style="position:relative;">
+          <button class="copy-code-btn" id="copyScriptBtn">Copy</button>
+          <pre id="scriptDisplay"></pre>
+        </div>
+      </div>
+      <button class="btn-goto-dash" id="gotoDashBtn">Open my dashboard →</button>
+    </div>
+  </div>
+
+  <!-- ── DASHBOARD ── -->
+  <div class="page" id="dashboard">
+    <nav class="dash-nav">
+      <div class="nav-logo">pulse<span>.</span></div>
+      <div class="nav-right">
+        <div class="live-pill"><div class="live-dot"></div>Live</div>
+        <select class="project-switcher" id="projectSwitcher"></select>
+        <button class="nav-btn" id="newProjectBtn">+ New</button>
+        <button class="nav-btn logout" id="logoutBtn">Sign out</button>
+      </div>
+    </nav>
+
+    <div class="dash-body">
+      <div class="dash-top">
+        <div class="dash-greeting">Hey, <span id="greetName">there</span>.</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="time-filter">
+            <button class="tf-btn active" data-range="24h">Today</button>
+            <button class="tf-btn" data-range="7d">7d</button>
+            <button class="tf-btn" data-range="30d">30d</button>
+          </div>
+          
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Page Views</div><div class="stat-value accent" id="statPageViews">–</div><div class="stat-delta" id="deltaPageViews">loading…</div></div>
+        <div class="stat-card"><div class="stat-label">Click Events</div><div class="stat-value" id="statClicks">–</div><div class="stat-delta" id="deltaClicks">loading…</div></div>
+        <div class="stat-card"><div class="stat-label">Total Events</div><div class="stat-value" id="statTotal">–</div><div class="stat-delta" id="deltaTotal">loading…</div></div>
+        <div class="stat-card"><div class="stat-label">Event Types</div><div class="stat-value" id="statTypes">–</div><div class="stat-delta">unique names</div></div>
+      </div>
+
+      <div class="main-grid">
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Event volume — <span class="panel-title-accent" id="rangeLabel">last 24 hours</span></div></div>
+          <div class="chart-area"><canvas id="eventChart"></canvas></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Live event feed</div><div class="live-pill"><div class="live-dot"></div>Live</div></div>
+          <div class="event-feed" id="eventFeed">
+            <div class="empty-state"><div class="empty-icon">◌</div><div class="empty-title">Listening…</div><div class="empty-sub">Events appear here in real-time</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-grid">
+        <div class="panel"><div class="panel-header"><div class="panel-title">Top pages</div></div><div id="topPages"><div class="empty-state" style="padding:40px 20px;"><div class="empty-sub">No page views yet</div></div></div></div>
+        <div class="panel"><div class="panel-header"><div class="panel-title">Top events</div></div><div id="topEvents"><div class="empty-state" style="padding:40px 20px;"><div class="empty-sub">No events yet</div></div></div></div>
+      </div>
+
+      <div class="panel" style="margin-top:20px;">
+        <div class="panel-header"><div class="panel-title">Your tracking script</div></div>
+        <div class="script-inner">
+          <p class="script-note">Paste this before <code>&lt;/body&gt;</code> on your website.</p>
+          <div class="code-block" style="position:relative;">
+            <button class="copy-code-btn" id="dashCopyBtn">Copy</button>
+            <pre id="dashScriptDisplay"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer style="text-align:center; padding:32px; font-size:12px; color:var(--muted); position:relative; z-index:1;">
+    <a href="/privacy.html" style="color:var(--muted2); text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted2)'">Privacy Policy</a>
+    <span style="margin:0 12px;">·</span>
+    © 2026 Pulse Analytics
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/dashboard.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
