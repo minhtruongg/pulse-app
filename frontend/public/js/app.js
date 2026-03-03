@@ -151,8 +151,16 @@
   });
 
   // ── Cancel new project
-  document.getElementById('cancelProjectBtn').addEventListener('click', () => {
-    loadDashboard();
+  document.getElementById('cancelProjectBtn').addEventListener('click', async () => {
+    const { projects } = await API.getProjects().catch(() => ({ projects: [] }));
+    if (projects && projects.length > 0) {
+      loadDashboard();
+    } else {
+      // No projects yet, go back to landing
+      await sb.auth.signOut();
+      API.token = null;
+      UI.showPage('landing');
+    }
   });
 
   // ── Go to dashboard from script page ─────────────────────
@@ -181,7 +189,7 @@
     });
   });
 
-  // ── Copy buttons ──────────────────────────────────────────
+// ── Copy buttons ──────────────────────────────────────────
   document.getElementById('copyIdBtn').addEventListener('click', () => {
     UI.copyText(document.getElementById('displayProjectId').textContent, document.getElementById('copyIdBtn'));
   });
