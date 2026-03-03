@@ -1,128 +1,54 @@
 # Pulse Analytics
 
-> One script tag. Real-time event tracking. Know what users actually do.
+A lightweight, self-hostable web analytics platform. Drop one script tag on any website and get a real-time dashboard showing page views, click events, and user interactions.
 
-## Project Structure
+Built with Node.js, Express, SQLite, Supabase auth, and vanilla JS. Deployed on Railway.
 
-```
-pulse/
-├── backend/
-│   ├── src/
-│   │   ├── server.js          # Express app entry point
-│   │   ├── db/
-│   │   │   └── database.js    # SQLite schema + queries
-│   │   └── routes/
-│   │       ├── projects.js    # POST /api/projects, GET /api/projects/:id
-│   │       └── events.js      # POST /e (tracking), GET /api/events/:id
-│   └── package.json
-├── frontend/
-│   └── public/
-│       ├── index.html
-│       ├── css/
-│       │   ├── base.css       # Variables, reset, shared
-│       │   ├── landing.css    # Landing + onboarding
-│       │   └── dashboard.css  # Dashboard
-│       └── js/
-│           ├── api.js         # All fetch() calls to backend
-│           ├── ui.js          # Rendering helpers
-│           ├── dashboard.js   # Dashboard: polling, chart, simulate
-│           └── app.js         # Event listeners, page flow
-├── Dockerfile
-├── docker-compose.yml
-└── railway.json
-```
+## Tech Stack
+
+- **Backend** — Node.js, Express
+- **Database** — SQLite via sql.js (pure JS, zero native compilation)
+- **Auth** — Supabase (JWT-based, email/password)
+- **Frontend** — Vanilla JS, Chart.js, CSS custom properties
+- **Deployment** — Railway (Dockerized)
+
+## How it works
+
+**Event ingestion** — a JS snippet auto-tracks page views, button clicks, and input focus. Events POST to `/e` which responds 200 immediately to avoid blocking the user's page load.
+
+**Auth** — Supabase handles signup/login and issues JWTs. The backend verifies tokens using the Supabase service role key. `/e` is public so the tracking script works without a session.
+
+**Storage** — events stored in SQLite, indexed on `project_id` and `ts`. Dashboard polls every 5 seconds. Aggregations (top pages, hourly volume) computed in SQL at query time.
+
+**Frontend** — SPA with no framework. Routing via CSS `display` toggling. Auth state via Supabase `onAuthStateChange`.
 
 ## API
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `POST` | `/api/projects` | Create a project. Body: `{ name, site }` |
-| `GET`  | `/api/projects/:id` | Get project info |
-| `POST` | `/e` | Ingest an event (tracking endpoint) |
-| `GET`  | `/api/events/:projectId?range=24h` | Get events + stats. Range: `24h`, `7d`, `30d` |
-
-### Tracking endpoint payload
-```json
-{
-  "pid":   "prj_abc123",
-  "event": "Page View",
-  "props": { "url": "https://mysite.com/home" },
-  "url":   "https://mysite.com/home"
-}
-```
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `POST` | `/e` | None | Ingest an event |
+| `POST` | `/api/projects` | Required | Create a project |
+| `GET` | `/api/projects` | Required | List your projects |
+| `GET` | `/api/events/:id?range=24h` | Required | Events + stats |
 
 ## Running locally
-
-### Option 1: Docker (easiest)
 ```bash
-docker compose up
-# Open http://localhost:3001
+git clone https://github.com/minhtruongg/pulse-app
+cd pulse-app/backend && npm install
+cp .env.example .env  # fill in SUPABASE_URL + SUPABASE_SERVICE_KEY
+npm start             # http://localhost:3001
 ```
 
-### Option 2: Node directly
-```bash
-cd backend
-npm install
-npm start
-# Open http://localhost:3001
-```
+## Design decisions
 
-## Deploy to Railway (free tier)
+**sql.js over better-sqlite3** — avoids node-gyp native compilation, works on Windows without Visual Studio.
 
-1. Push this repo to GitHub
-2. Go to [railway.app](https://railway.app) → New Project → Deploy from GitHub
-3. Select your repo — Railway auto-detects the Dockerfile
-4. Add a volume at `/data` for SQLite persistence:
-   - In Railway: your service → Volumes → Add Volume → Mount path: `/data`
-5. Your app is live 🎉
+**No frontend framework** — UI is simple enough that Vanilla JS is cleaner and keeps the bundle tiny.
 
-**Set environment variables in Railway if needed:**
-- `PORT` — Railway sets this automatically
-- `DATA_DIR` — defaults to `/data`
+**Polling over WebSockets** — 5s polling is simpler infrastructure with acceptable latency for analytics.
 
-## Deploy to Render (free tier)
+**Server-side click filtering** — junk clicks filtered in the backend so all users benefit without updating their script.
 
-1. Push to GitHub
-2. [render.com](https://render.com) → New → Web Service → Connect repo
-3. Runtime: **Docker**
-4. Add a Disk: Mount path `/data`, Size 1GB
-5. Deploy
+## License
 
-## Adding the tracking script to your site
-
-After signing up, you'll get a snippet like this:
-
-```html
-<!-- Pulse Analytics -->
-<script>
-(function() {
-  var PID = "prj_yourid";
-  var API = "https://your-app.railway.app/e";
-  function track(name, props) {
-    fetch(API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pid: PID, event: name, props: props, url: location.href })
-    }).catch(function(){});
-  }
-  track('Page View', { url: location.href, ref: document.referrer });
-  document.addEventListener('click', function(e) {
-    track('Click', { el: e.target.tagName, text: (e.target.innerText||'').slice(0,40) });
-  });
-  document.addEventListener('focusin', function(e) {
-    var t = e.target;
-    if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')
-      track('Input Focus', { field: t.name || t.id || t.type });
-  });
-  window.pulse = { track: track };
-})();
-</script>
-```
-
-Paste it before `</body>`. Done.
-
-### Manual tracking
-```js
-window.pulse.track('Signed Up', { plan: 'free' });
-window.pulse.track('Watched Video', { title: 'Demo' });
-```
+MIT
